@@ -1,7 +1,9 @@
 '''
     Improvements:
-        -Use txt file as list of input to be executed
+        -Use txt file as list of input to be executed OK
         -Reuse metadata files that have been extracted on this month
+        -Create Postgres
+        -Create SCD tables
         -Create a docker
         -Create a job to run daily
         -Create notification if fails
