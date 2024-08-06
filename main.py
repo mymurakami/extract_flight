@@ -3,6 +3,10 @@
         -Connect to github - OK
         -Use txt file as list of input to be executed - OK
         -Reuse metadata files that have been extracted on this month
+            -Add for country OK
+                -Test
+            -Add for airport origin and dest
+                -Test
         -Create a docker
         -Create a job to run daily
         -Add logging
@@ -16,6 +20,7 @@
 # Import libraries
 import json
 import os
+from pickle import TRUE
 import pandas as pd
 import http.client
 from datetime import datetime
@@ -36,13 +41,23 @@ formatted_ym   = now.strftime('%Y%m')
 # Read input file
 input_file = file_utils.read_input_file('./input.txt')
 
-# Get countries data
-df_country = api.get_country()
+folder_check = file_utils.folder_exists(f'metadata/{formatted_ym}')
+latest_file = file_utils.get_latest_file(f'metadata/{formatted_ym}','countries_')
 
-# Export DataFrame to CSV file
-csv_file_path = f'metadata/{formatted_ym}/countries_{formatted_time}.csv'
-os.makedirs(os.path.dirname(csv_file_path), exist_ok=True)
-df_country.to_csv(csv_file_path, sep=';', index=False)
+# Check if the folder was created and there is a country file
+if folder_check == True and latest_file != None:
+    # Read the file on ym folder
+    latest_file = file_utils.get_latest_file(f'metadata/{formatted_ym}','countries_')
+    df_country = pd.read_csv(latest_file)
+
+else:
+    # Get countries data
+    df_country = api.get_country()
+
+    # Export DataFrame to CSV file 
+    csv_file_path = f'metadata/{formatted_ym}/countries_{formatted_time}.csv'
+    os.makedirs(os.path.dirname(csv_file_path), exist_ok=True)
+    df_country.to_csv(csv_file_path, sep=';', index=False)
 
 
 for section in input_file.sections():
