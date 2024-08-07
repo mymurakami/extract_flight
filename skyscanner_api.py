@@ -50,16 +50,18 @@ class SkyscannerAPI:
     
     # Get flights
     def get_flight(self, origin_id, dest_id,  dep_date, ret_date, country, currency, market, locale):
-        self.conn.request("GET", f"/api/v1/flights/search-roundtrip?fromId={origin_id}&toId={dest_id}&departDate={dep_date}&returnDate={ret_date}&adults=1&cabinClass=economy&currency={currency}&market={market}&locale={locale}", headers=self.header)
+        self.conn.request("GET", f"/api/v1/flights/search-roundtrip?fromId={origin_id}&toId={origin_id}&departDate={dep_date}&returnDate={ret_date}&adults=1&cabinClass=economy&currency={currency}&market={market}&locale={locale}", headers=self.header)
 
         res = self.conn.getresponse()
         data = res.read()
         parsed_json = json.loads(data.decode("utf-8"))
         data = parsed_json["data"]["itineraries"]
-        df = pd.DataFrame(data)
-        
-        df[f'price_{currency}'] = df.price.str['raw'].replace('.','').replace('.',',')
-        ##.apply(self.extract_nested_name)
-        df = df.drop(columns=['price'])
+        if data == []:
+            df = None
+        else:
+            df = pd.DataFrame(data)
+            df[f'price_{currency}'] = df.price.str['raw'].replace('.','').replace('.',',')
+            ##.apply(self.extract_nested_name)
+            df = df.drop(columns=['price'])
         
         return df
